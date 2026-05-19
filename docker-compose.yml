@@ -1,0 +1,32 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: rill
+      POSTGRES_PASSWORD: rill
+      POSTGRES_DB: rill
+    ports:
+      - "5432:5432"
+    volumes:
+      - rill_pg_data:/var/lib/postgresql/data
+  backend:
+    build:
+      context: ./backend
+    environment:
+      DATABASE_URL: postgresql+psycopg://rill:rill@db:5432/rill
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+  frontend:
+    build:
+      context: ./frontend
+    environment:
+      NEXT_PUBLIC_API_BASE: http://localhost:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  rill_pg_data:
